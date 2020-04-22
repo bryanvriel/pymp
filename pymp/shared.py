@@ -12,7 +12,6 @@ try:
 except ImportError:  # pragma: no cover
     _NP_AVAILABLE = False
 
-_MANAGER = _multiprocessing.Manager()  # pylint: disable=no-member
 _NUM_PROCS = _multiprocessing.Value("i", 1, lock=False)  # pylint: disable=no-member
 _LOCK = lock()
 _PRINT_LOCK = lock()
@@ -39,14 +38,20 @@ def array(shape, dtype=_np.float64, autolock=False):
 
 def list(*args, **kwargs):  # pylint: disable=redefined-builtin
     """Create a shared list."""
-    return _MANAGER.list(*args, **kwargs)
+    with _multiprocessing.Manager() as manager:
+        l = manager.list(*args, **kwargs)
+    return l
 
 
 def dict(*args, **kwargs):  # pylint: disable=redefined-builtin
     """Create a shared dict."""
-    return _MANAGER.dict(*args, **kwargs)
+    with _multiprocessing.Manager() as manager:
+        d = manager.dict(*args, **kwargs)
+    return d
 
 
 def queue(*args, **kwargs):
     """Create a shared queue."""
-    return _MANAGER.Queue(*args, **kwargs)
+    with _multiprocessing.Manager() as manager:
+        q = manager.Queue(*args, **kwargs)
+    return q
